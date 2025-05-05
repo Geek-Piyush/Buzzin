@@ -1,66 +1,67 @@
-**Built With**: Flutter • Dart
 
-
-🚀 How to Run the BuzzIn Flutter App
-
-Follow the steps below to set up and run this project locally:
 
 ---
 
-1. 📦 Create a New Flutter Project
+# BuzzIn Flutter App
 
-```bash
-flutter create buzzin
-```
+A lightweight Flutter app built for a coding project submission. This repository contains the core app logic (`lib/`) and `pubspec.yaml` to get it up and running quickly. The app also integrates with Firebase for backend services.
 
-> You can replace `buzzin` with any other app name if desired.
+## 🚀 How to Run
 
----
+1. **Create a new Flutter project**
 
-2. 🔁 Replace Files from ZIP
+   ```bash
+   flutter create buzzin
+   ```
 
-1. Unzip the provided project ZIP file.
-2. Copy the contents of the unzipped `lib` folder into the `lib/` directory of your newly created Flutter app.
-3. Replace the `pubspec.yaml` in the new project with the one provided in the repository.
+2. **Replace files**
 
-⚠️ **Make sure to overwrite the files.**
+   * Copy the `lib/` folder from this repo into the new project.
+   * Replace `pubspec.yaml` with the one provided here.
+   * Overwrite if prompted.
 
+3. *(Optional)* Rename folder if needed:
 
-### 3. 🛠 Update the Project Folder Name (Optional)
+   ```bash
+   mv buzzin your_app_name
+   cd your_app_name
+   ```
 
-If you named your app something different from `buzzin`, update the directory name accordingly.
+4. **Set up Firebase**
 
-```bash
-mv buzzin your_app_name
-cd your_app_name
-```
+   * Go to the [Firebase Console](https://console.firebase.google.com/).
+   * Create a new Firebase project.
+   * Add your Android/iOS app to Firebase.
+   * Download the `google-services.json` (for Android) or `GoogleService-Info.plist` (for iOS) and place it in the appropriate directory (`android/app` for Android or `ios/Runner` for iOS).
+   * Follow the official Firebase setup guide to enable the required services (like Firestore, Firebase Auth, etc.).
 
----
+5. **Install Firebase dependencies**
+   In the `pubspec.yaml`, make sure to include the necessary Firebase packages:
 
-### 4. 📦 Get Dependencies
+   ```yaml
+   dependencies:
+     firebase_core: ^1.10.0
+     firebase_auth: ^3.3.4
+     cloud_firestore: ^3.1.5
+   ```
 
-Run this command to fetch all required packages:
+6. **Get dependencies**
 
-```bash
-flutter pub get
-```
+   ```bash
+   flutter pub get
+   ```
 
----
+7. **Run the app**
 
-### 5. ▶️ Run the App
+   ```bash
+   flutter run
+   ```
 
-Connect a device/emulator, then run:
+## 🛠 Tech Stack
 
-```bash
-flutter run
-```
-
----
-
-### ✅ Done!
-
-You should now see the **BuzzIn App** running on your device 🎉  
-Happy coding!
+* **Flutter**
+* **Dart**
+* **Firebase** (Firebase Auth, Firestore, etc.)
 
 ---
 
