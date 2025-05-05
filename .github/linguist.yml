@@ -1,0 +1,15 @@
+
+
+languages:
+  Dart:
+    - "*.dart"
+    - "lib/**.dart"
+    - "test/**.dart"
+  Flutter:
+    - "android/**"
+    - "ios/**"
+    - "lib/**"
+    - "test/**"
+  Firebase:
+    - "android/app/google-services.json"  # Android Firebase config file
+    - "ios/Runner/GoogleService-Info.plist"  # iOS Firebase config file
