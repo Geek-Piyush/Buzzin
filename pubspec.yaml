@@ -75,6 +75,7 @@ flutter:
   assets:
     - assets/images/chat.png
     - assets/images/Buzzin.png
+    - assets/images/default_pp.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

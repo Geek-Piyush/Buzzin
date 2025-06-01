@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:buzzin/Widget/event_card.dart';
 import 'package:buzzin/screens/chat.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:buzzin/screens/profile_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -35,26 +36,60 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = FirebaseAuth.instance.currentUser!;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 42, 174, 210),
-        title: GestureDetector(
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (ctx) => const AboutPage()),
+        title: FutureBuilder<DocumentSnapshot>(
+          future: FirebaseFirestore.instance
+              .collection('users')
+              .doc(currentUser.uid)
+              .get(),
+          builder: (ctx, snapshot) {
+            final userData = snapshot.hasData
+                ? snapshot.data?.data() as Map<String, dynamic>?
+                : null;
+            final imageUrl = userData?['image_url'];
+
+            return Row(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (ctx) => const ProfilePage()),
+                    );
+                  },
+                  child: CircleAvatar(
+                    radius: 18,
+                    backgroundImage: imageUrl != null && imageUrl.isNotEmpty
+                        ? NetworkImage(imageUrl)
+                        : const AssetImage('assets/images/default_pp.png')
+                            as ImageProvider,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (ctx) => const AboutPage()),
+                    );
+                  },
+                  child: Text(
+                    "Buzzin'",
+                    style: GoogleFonts.bangers(
+                      textStyle: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.2,
+                        fontSize: 30,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             );
           },
-          child: Text(
-            "Buzzin'",
-            style: GoogleFonts.bangers(
-              textStyle: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 1.2,
-                fontSize: 30,
-              ),
-            ),
-          ),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
