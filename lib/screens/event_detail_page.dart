@@ -20,11 +20,37 @@ class EventDetailPage extends StatefulWidget {
 class _EventDetailPageState extends State<EventDetailPage> {
   bool _isInterested = false;
   final userId = FirebaseAuth.instance.currentUser?.uid;
+  bool _isCreator = false;
+  bool _isRegistered = false;
 
   @override
   void initState() {
     super.initState();
     _checkInterestStatus();
+    _checkIfCreator();
+    _checkIfRegistered();
+  }
+
+  void _checkIfCreator() {
+    final creatorId = widget.eventData['creatorId'];
+    setState(() {
+      _isCreator = userId == creatorId;
+    });
+  }
+
+  Future<void> _checkIfRegistered() async {
+    final doc = await FirebaseFirestore.instance
+        .collection('events')
+        .doc(widget.eventData.id)
+        .collection('registrations')
+        .doc(userId)
+        .get();
+
+    if (mounted) {
+      setState(() {
+        _isRegistered = doc.exists;
+      });
+    }
   }
 
   void _checkInterestStatus() async {
@@ -322,6 +348,48 @@ class _EventDetailPageState extends State<EventDetailPage> {
             ),
           ),
           const SizedBox(height: 20),
+          if (!_isCreator)
+            ElevatedButton.icon(
+              icon: Icon(
+                _isRegistered ? Icons.check_circle : Icons.how_to_reg,
+                color: Colors.white,
+              ),
+              label: Text(_isRegistered ? "Registered" : "Register Now"),
+              onPressed: _isRegistered
+                  ? null
+                  : () async {
+                      final currentUser = FirebaseAuth.instance.currentUser!;
+                      final userDoc = await FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(currentUser.uid)
+                          .get();
+
+                      final userData = userDoc.data()!;
+                      await FirebaseFirestore.instance
+                          .collection('events')
+                          .doc(widget.eventData.id)
+                          .collection('registrations')
+                          .doc(currentUser.uid)
+                          .set({
+                        'username': userData['username'],
+                        'email': userData['email'],
+                      });
+
+                      if (mounted) {
+                        setState(() {
+                          _isRegistered = true;
+                        });
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('You are registered!')),
+                        );
+                      }
+                    },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _isRegistered ? Colors.green : Colors.blue,
+                foregroundColor: Colors.white,
+              ),
+            ),
+          const SizedBox(height: 20),
           if (data['googleFormLink'] != null &&
               data['googleFormLink'].toString().isNotEmpty)
             Center(
@@ -397,6 +465,61 @@ class _EventDetailPageState extends State<EventDetailPage> {
                         fit: BoxFit.contain,
                       ),
                     ),
+                    if (_isCreator)
+                      FutureBuilder<QuerySnapshot>(
+                        future: FirebaseFirestore.instance
+                            .collection('events')
+                            .doc(widget.eventData.id)
+                            .collection('registrations')
+                            .get(),
+                        builder: (ctx, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const CircularProgressIndicator();
+                          }
+
+                          final registrations = snapshot.data?.docs ?? [];
+
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 20),
+                              const Text(
+                                'Registrations',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: DataTable(
+                                  columns: const [
+                                    DataColumn(label: Text('Sr. No')),
+                                    DataColumn(label: Text('Username')),
+                                    DataColumn(label: Text('Contact')),
+                                  ],
+                                  rows: List.generate(
+                                    registrations.length,
+                                    (index) {
+                                      final reg = registrations[index].data()!
+                                          as Map<String, dynamic>;
+                                      return DataRow(
+                                        cells: [
+                                          DataCell(Text('${index + 1}')),
+                                          DataCell(Text(reg['username'] ?? '')),
+                                          DataCell(Text(reg['email'] ?? '')),
+                                        ],
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
                   ],
                 ),
               ),
